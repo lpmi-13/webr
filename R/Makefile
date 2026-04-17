@@ -109,6 +109,15 @@ STAGE2_FFLAGS += --target=wasm32-unknown-emscripten
 STAGE2_FFLAGS += -O2
 STAGE2_FFLAGS += -fPIC
 
+# Let optional Tcl/Tk recipes participate in configure-time detection.
+R_TCLTK_CONFIG_ARGS :=
+ifneq ($(wildcard $(WASM)/lib/tclConfig.sh),)
+R_TCLTK_CONFIG_ARGS += --with-tcl-config="$(WASM)/lib/tclConfig.sh"
+endif
+ifneq ($(wildcard $(WASM)/lib/tkConfig.sh),)
+R_TCLTK_CONFIG_ARGS += --with-tk-config="$(WASM)/lib/tkConfig.sh"
+endif
+
 # This is symlinked at configure-time
 include $(TOOLS)/fortran.mk
 
@@ -189,6 +198,7 @@ $(BUILD)/state/R-$(R_VERSION)/r-stage2-configured: $(BUILD)/state/R-$(R_VERSION)
 	    --disable-nls \
 	    --enable-static=yes \
 	    --host=wasm32-unknown-emscripten \
+	    $(R_TCLTK_CONFIG_ARGS) \
 	    --with-internal-tzcode
 	touch $@
 
